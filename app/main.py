@@ -1,6 +1,7 @@
 import requests
 
 url = "http://localhost:11434/api/generate"
+
 resp = requests.post(
     url,
     json={
