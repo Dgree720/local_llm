@@ -8,7 +8,3 @@ for file in os.listdir(knowledge_path):
     with open(path, "r") as f:
         content = f.read()
         print(content)
-
-
-"test"
-"test 2"
