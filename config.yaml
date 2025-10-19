@@ -1,0 +1,4 @@
+model_path: /home/andreas/Documents/Python/local_llm/models
+required_models:
+  embed_model: granite-embedding-107m-multilingual
+  language_model: ''

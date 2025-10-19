@@ -1,14 +1,10 @@
 import requests
+from utils.download_models import download_models
+from utils.configuration import config
 
-url = "http://localhost:11434/api/generate"
 
-resp = requests.post(
-    url,
-    json={
-        "model": "dolphin-llama3",  # 👈 model slug here
-        "prompt": "Write a haiku about local llms.",
-        "stream": False,  # set True for streaming responses
-    },
-)
+config = config()
+required_models = [config["required_models"][i] for i in config["required_models"]]
+models_path = config["model_path"]
 
-print(resp.json()["response"])
+download_models(models_path, required_models)
