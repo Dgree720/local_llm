@@ -7,7 +7,11 @@ def config():
     try:
         parent = Path.cwd().parent
         config_path = f"{parent}/config.yaml"
-        models_path = f"{parent}/models"
+        if os.path.isdir(f"{parent}/models"):
+            models_path = f"{parent}/models"
+        else:
+            os.mkdir(f"{parent}/models")
+            models_path = f"{parent}/models"
 
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)

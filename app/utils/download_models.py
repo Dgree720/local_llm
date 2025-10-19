@@ -1,7 +1,7 @@
 # Load model directly
 from transformers import AutoTokenizer, AutoModel
 import os
-import yaml
+from huggingface_hub import snapshot_download
 
 
 def download_models(model_path, required_models):
@@ -16,14 +16,16 @@ def download_models(model_path, required_models):
                     try:
                         if i in ["y", "yes"]:
                             try:
-                                AutoTokenizer.from_pretrained(
-                                    "ibm-granite/granite-embedding-107m-multilingual",
-                                    cache_dir=model_path,
+                                snapshot_download(
+                                    repo_id=model,
+                                    local_dir=f"{model_path}/{model}",
+                                    local_dir_use_symlinks=False,
+                                    revision="main",  # optional, can be a specific tag/commit
+                                    ignore_patterns=[
+                                        "*.lock"
+                                    ],  # avoids cache artifacts
                                 )
-                                AutoModel.from_pretrained(
-                                    "ibm-granite/granite-embedding-107m-multilingual",
-                                    cache_dir=model_path,
-                                )
+
                                 print(f"Successfully downloaded {model}")
                                 break
                             except Exception as e:
