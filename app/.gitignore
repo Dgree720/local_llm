@@ -1,1 +1,5 @@
 models/
+.env
+env
+documents/
+
