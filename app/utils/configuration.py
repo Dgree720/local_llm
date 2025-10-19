@@ -23,4 +23,4 @@ def config():
         return config
 
     except Exception as e:
-        print(f"Error occured:\n{e}")
+        print(f"Error occurred:\n{e}")

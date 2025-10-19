@@ -15,16 +15,19 @@ def download_models(model_path, required_models):
                     ).lower()
                     try:
                         if i in ["y", "yes"]:
-                            AutoTokenizer.from_pretrained(
-                                "ibm-granite/granite-embedding-107m-multilingual",
-                                cache_dir=model_path,
-                            )
-                            AutoModel.from_pretrained(
-                                "ibm-granite/granite-embedding-107m-multilingual",
-                                cache_dir=model_path,
-                            )
-                            print(f"Successfully downloaded {model}")
-                            break
+                            try:
+                                AutoTokenizer.from_pretrained(
+                                    "ibm-granite/granite-embedding-107m-multilingual",
+                                    cache_dir=model_path,
+                                )
+                                AutoModel.from_pretrained(
+                                    "ibm-granite/granite-embedding-107m-multilingual",
+                                    cache_dir=model_path,
+                                )
+                                print(f"Successfully downloaded {model}")
+                                break
+                            except Exception as e:
+                                print(f"Error occurred:\n{e}")
                         elif i in ["n", "no"]:
                             print("okay, exiting")
                             break
