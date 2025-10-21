@@ -12,11 +12,14 @@ def config():
             models_path = f"{parent}/models"
         else:
             os.mkdir(f"{parent}/models")
-            models_path = f"{parent}/models"
-
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
 
+        # define paths
+        models_path = f"{parent}/models"
+        vector_store = os.path.join(os.getcwd(), "chroma_db")
+
+        # write paths to config
         config["model_path"] = models_path
 
         with open(config_path, "w") as f:

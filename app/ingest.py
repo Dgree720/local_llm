@@ -4,41 +4,51 @@ from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
 import shutil
+from omegaconf import OmegaConf
 
-knowledge_path = "/home/andreas/Documents/Python/local_llm/documents"
-
-# if os.path.isdir(CHROMA_DB_DIR):
-#    shutil.rmtree(CHROMA_DB_DIR)
-
-CHUNK_SIZE = 500
-OVERLAP = 100
-CHROMA_DB_DIR = os.path.join(os.getcwd(), "chroma_db")
-
-embedder = HuggingFaceEmbeddings(
-    model_name="/home/andreas/Documents/Python/local_llm/models/ibm-granite/granite-embedding-107m-multilingual"
-)
-
-if os.path.isdir(CHROMA_DB_DIR):
-    chroma = Chroma(persist_directory=CHROMA_DB_DIR, embedding_function=embedder)
-else:
-    os.makedirs(CHROMA_DB_DIR, exist_ok=True)
-    loader = DirectoryLoader(knowledge_path)
-    docs = loader.load()
-
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE, chunk_overlap=OVERLAP
-    )
-    chunks = splitter.split_documents(docs)
-
-    for i, doc in enumerate(chunks):
-        doc.metadata["chunk_id"] = i
-
-    chroma = Chroma.from_documents(
-        documents=chunks, persist_directory=CHROMA_DB_DIR, embedding=embedder
-    )
+config = OmegaConf.load("config.yaml")
 
 
-retriever = chroma.as_retriever(search_kwargs={"k": 3})
+class Retriever:
+    def __init__(self, retriever_config: OmegaConf):
+        self.config = retriever_config
+        self.model_name = retriever_config.embed_model
+        self.vector_path = retriever_config.vector_store_path
+        self.embedding_model_path = retriever_config.embedding_model_path
+        self.knowledge_path = retriever_config.knowledge_path
+        self.chunk_size = retriever_config.chunk_size
+        self.chunk_overlap = retriever_config.chunk_overlap
+
+        embedder = HuggingFaceEmbeddings(model_name=self.embedding_model_path)
+
+    def vectorize(self):
+        if os.path.isdir(self.vector_path):
+            chroma = Chroma(
+                persist_directory=self.vector_path, embedding_function=embedder
+            )
+        else:
+            os.makedirs(self.vector_path, exist_ok=True)
+
+            loader = DirectoryLoader(self.knowledge_path)
+            docs = loader.load()
+
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
+            )
+            chunks = splitter.split_documents(docs)
+
+            for i, doc in enumerate(chunks):
+                doc.metadata["chunk_id"] = i
+
+            chroma = Chroma.from_documents(
+                documents=chunks, persist_directory=self.vector_path, embedding=embedder
+            )
+
+    def retrieve(self, query):
+        retriever = chroma.as_retriever(search_kwargs={"k": 3})
 
 
 relevant_docs = retriever.invoke("What is a transformer?")
+
+ret = Retriever(config.retriever_config)
+print(ret.model_name)

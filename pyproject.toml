@@ -12,6 +12,7 @@ dependencies = [
     "langchain-huggingface>=1.0.0",
     "langchain-ollama>=1.0.0",
     "ollama>=0.6.0",
+    "omegaconf>=2.3.0",
     "pyaml>=25.7.0",
     "sentence-transformers>=5.1.1",
     "torch>=2.9.0",

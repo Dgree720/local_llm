@@ -1,0 +1,10 @@
+llm_config:
+  model_path: /home/andreas/Documents/Python/local_llm/models
+  language_model: "gemma3:1b"
+
+retriever_config:
+  embed_model: "ibm-granite/granite-embedding-107m-multilingual"
+  embed_model_path: ""
+  chunk_size: 500
+  overlap: 100
+  vector_db_path:
