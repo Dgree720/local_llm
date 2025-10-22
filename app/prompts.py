@@ -1,7 +1,4 @@
-from langchain_core.prompts import PromptTemplate
-
-
-def make_prompt(user_query, retrieved_context):
+def make_prompt():
     prompt_template = """
     You are a retrieval-augmented AI assistant running locally through Ollama, using the Gemma language model.
 
@@ -47,8 +44,4 @@ def make_prompt(user_query, retrieved_context):
     
     """
 
-    prompt = PromptTemplate(
-        template=prompt_template, input_variables=[retrieved_context, user_query]
-    )
-
-    return prompt
+    return prompt_template

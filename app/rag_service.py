@@ -1,6 +1,6 @@
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
 import shutil
@@ -12,19 +12,20 @@ config = OmegaConf.load("config.yaml")
 class Retriever:
     def __init__(self, retriever_config: OmegaConf):
         self.config = retriever_config
-        self.model_name = retriever_config.embed_model
-        self.vector_path = retriever_config.vector_store_path
+        self.embedding_model_name = retriever_config.embed_model
         self.embedding_model_path = retriever_config.embedding_model_path
+        self.vector_path = retriever_config.vector_db_path
         self.knowledge_path = retriever_config.knowledge_path
         self.chunk_size = retriever_config.chunk_size
         self.chunk_overlap = retriever_config.chunk_overlap
 
-        embedder = HuggingFaceEmbeddings(model_name=self.embedding_model_path)
+        self.embedder = HuggingFaceEmbeddings(model_name=self.embedding_model_path)
+        self.chroma = self.vectorize()
 
     def vectorize(self):
         if os.path.isdir(self.vector_path):
             chroma = Chroma(
-                persist_directory=self.vector_path, embedding_function=embedder
+                persist_directory=self.vector_path, embedding_function=self.embedder
             )
         else:
             os.makedirs(self.vector_path, exist_ok=True)
@@ -41,14 +42,15 @@ class Retriever:
                 doc.metadata["chunk_id"] = i
 
             chroma = Chroma.from_documents(
-                documents=chunks, persist_directory=self.vector_path, embedding=embedder
+                documents=chunks,
+                persist_directory=self.vector_path,
+                embedding_function=self.embedder,
             )
 
-    def retrieve(self, query):
-        retriever = chroma.as_retriever(search_kwargs={"k": 3})
+        return chroma
 
+    def retrieve(self, query, k=3):
+        retriever = self.chroma.as_retriever(search_kwargs={"k": 3})
+        relevant_docs = retriever.invoke(query)
 
-relevant_docs = retriever.invoke("What is a transformer?")
-
-ret = Retriever(config.retriever_config)
-print(ret.model_name)
+        return relevant_docs
