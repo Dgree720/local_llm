@@ -9,7 +9,7 @@ from pathlib import Path
 import stat
 import os
 import sys
-from prompts import make_prompt
+from prompts import make_prompt, make_prompt2
 import requests as re
 import json
 
@@ -23,7 +23,7 @@ class LLM_Service:
 
         # self.server = self.start_ollama_server()
         # self.llm = self.fetch_llm()
-        # self.prompt = make_prompt()
+        self.prompt = make_prompt()
         # self.chain = self.make_chain()
 
     def start_ollama_server(self):
@@ -85,7 +85,7 @@ class LLM_Service:
             return False
 
     def fetch_llm(self):
-        llm = OllamaLLM(model="gemma3:1b", temperature=0.4)
+        llm = OllamaLLM(model="tinydolphin:latest", temperature=0.4)
 
         self.llm = llm
         # print(f"LLM {llm.model} running")
@@ -106,6 +106,7 @@ class LLM_Service:
             | StrOutputParser()
         )
 
+        self.chain = chain
         return chain
 
     def get_response(self, user_query, context):
@@ -114,10 +115,10 @@ class LLM_Service:
         return response
 
     def get_quick_response(self, user_query, context):
-        prompt = make_prompt(user_query, context)
-        print(prompt)
+        prompt = make_prompt2(user_query, context)
+        # print(prompt)
         url = "http://127.0.0.1:11434/api/generate"
-        data = {"model": "gemma3:1b", "prompt": prompt, "stream": True}
+        data = {"model": "tinydolphin:latest", "prompt": prompt, "stream": True}
 
         with re.post(url, json=data, stream=True) as r:
             for line in r.iter_lines(decode_unicode=True):

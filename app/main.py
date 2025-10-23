@@ -37,6 +37,7 @@ def main():
         llm.start_ollama_server()
 
     llm.fetch_llm()
+    llm.make_chain()
 
     with alive_bar(100) as bar:
         for _ in range(100):
