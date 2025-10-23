@@ -11,6 +11,7 @@ import os
 import sys
 from prompts import make_prompt
 import requests as re
+import json
 
 
 class LLM_Service:
@@ -20,22 +21,19 @@ class LLM_Service:
         )
         os.environ["OLLAMA_HOST"] = "http://127.0.0.1:11434"
 
-        self.server = self.start_ollama_server()
-        self.llm = self.fetch_llm()
-        self.prompt = make_prompt()
+        # self.server = self.start_ollama_server()
+        # self.llm = self.fetch_llm()
+        # self.prompt = make_prompt()
+        # self.chain = self.make_chain()
 
     def start_ollama_server(self):
         # check if instance of ollama server is already running
-        try:
-            response = re.get("http://127.0.0.1:11434")
-            print("Ollama server already running")
-            return True
-        except Exception:
-            print("Starting Ollama server")
+
+        print("Starting Ollama server")
         user_os = sys.platform
 
         if user_os in ["linux", "darwin"]:
-            print(f"User OS recognized as {user_os}")
+            # print(f"User OS recognized as {user_os}")
             script = Path(
                 "/home/andreas/Documents/Python/local_llm/app/serve_ollama_posix.sh"
             )
@@ -51,7 +49,7 @@ class LLM_Service:
                     stderr=subprocess.DEVNULL,
                 )
                 print("ollama starting")
-                time.sleep(10)
+                time.sleep(5)
                 return True
             except Exception as e:
                 print(f"error occurred: {e}")
@@ -75,7 +73,7 @@ class LLM_Service:
                 )
 
                 print("ollama starting")
-                time.sleep(3)
+                time.sleep(5)
                 return True
 
             except Exception as e:
@@ -89,11 +87,12 @@ class LLM_Service:
     def fetch_llm(self):
         llm = OllamaLLM(model="gemma3:1b", temperature=0.4)
 
-        print(f"LLM {llm.model} running")
+        self.llm = llm
+        # print(f"LLM {llm.model} running")
 
         return llm
 
-    def get_response(self, user_query, context):
+    def make_chain(self):
         prompt = PromptTemplate(
             template=self.prompt, input_variables=["user_query", "context"]
         )
@@ -107,6 +106,31 @@ class LLM_Service:
             | StrOutputParser()
         )
 
-        response = chain.invoke({"query": user_query, "context": context})
+        return chain
+
+    def get_response(self, user_query, context):
+        response = self.chain.invoke({"user_query": user_query, "context": context})
 
         return response
+
+    def get_quick_response(self, user_query, context):
+        prompt = make_prompt(user_query, context)
+        print(prompt)
+        url = "http://127.0.0.1:11434/api/generate"
+        data = {"model": "gemma3:1b", "prompt": prompt, "stream": True}
+
+        with re.post(url, json=data, stream=True) as r:
+            for line in r.iter_lines(decode_unicode=True):
+                if not line:
+                    continue
+                chunk = json.loads(line)
+                if "response" in chunk:
+                    sys.stdout.write(chunk["response"])
+                    sys.stdout.flush()
+                if chunk.get("done"):
+                    break
+        print()
+
+    def stream_response(self, user_query, context):
+        for chunk in self.llm.stream("Why do parrots have colorful feathers?"):
+            print(chunk.text, end="|", flush=True)

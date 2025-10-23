@@ -6,8 +6,8 @@ retriever_config:
   knowledge_path: /home/andreas/Documents/Python/local_llm/documents
   embed_model: "ibm-granite/granite-embedding-107m-multilingual"
   embedding_model_path: /home/andreas/Documents/Python/local_llm/models/ibm-granite/granite-embedding-107m-multilingual
-  chunk_size: 500
-  chunk_overlap: 100
+  chunk_size: 300
+  chunk_overlap: 50
   vector_db_path: /home/andreas/Documents/Python/local_llm/app/chroma_db
 
 

@@ -49,8 +49,15 @@ class Retriever:
 
         return chroma
 
-    def retrieve(self, query, k=3):
-        retriever = self.chroma.as_retriever(search_kwargs={"k": 3})
-        relevant_docs = retriever.invoke(query)
+    def retrieve(self, query):
+        retriever = self.chroma.as_retriever(
+            search_type="similarity_score_threshold",
+            search_kwargs={"k": 3, "score_threshold": 0.6},
+        )
+        relevant_docs_raw = retriever.invoke(query)
+        relevant_docs_raw
+        relevant_docs = "".join(
+            [Document.page_content for Document in relevant_docs_raw]
+        )
 
         return relevant_docs
