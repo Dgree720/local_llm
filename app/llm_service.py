@@ -59,7 +59,7 @@ class LLM_Service:
             script = Path("/home/andreas/Documents/local_llm/serve_ollama_windows.ps1")
 
             try:
-                process = subprocess.Popen(
+                subprocess.Popen(
                     [
                         "powershell.exe",
                         "-ExecutionPolicy",
@@ -130,7 +130,3 @@ class LLM_Service:
                 if chunk.get("done"):
                     break
         print()
-
-    def stream_response(self, user_query, context):
-        for chunk in self.llm.stream("Why do parrots have colorful feathers?"):
-            print(chunk.text, end="|", flush=True)
