@@ -22,6 +22,11 @@ class Retriever:
         self.embedder = HuggingFaceEmbeddings(model_name=self.embedding_model_path)
         self.chroma = self.vectorize()
 
+        self.retriever = self.chroma.as_retriever(
+            search_type="similarity_score_threshold",
+            search_kwargs={"k": 2, "score_threshold": 0.5},
+        )
+
     def vectorize(self):
         if os.path.isdir(self.vector_path):
             chroma = Chroma(
@@ -50,11 +55,7 @@ class Retriever:
         return chroma
 
     def retrieve(self, query):
-        retriever = self.chroma.as_retriever(
-            search_type="similarity_score_threshold",
-            search_kwargs={"k": 2, "score_threshold": 0.6},
-        )
-        relevant_docs_raw = retriever.invoke(query)
+        relevant_docs_raw = self.retriever.invoke(query)
         relevant_docs = "".join(
             [Document.page_content for Document in relevant_docs_raw]
         )
