@@ -26,7 +26,7 @@ def main():
     )
     with alive_bar(100) as bar:
         for _ in range(100):
-            time.sleep(0.0.005)
+            time.sleep(0.005)
             bar()
 
     llm = LLM_Service()
@@ -41,7 +41,7 @@ def main():
 
     with alive_bar(100) as bar:
         for _ in range(100):
-            time.sleep(0.0.005)
+            time.sleep(0.005)
             bar()
     print(f"LLM {llm.llm.model} running\n")
 
