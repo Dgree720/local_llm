@@ -9,11 +9,6 @@ from alive_progress import alive_bar
 import requests
 
 
-os.environ["OLLAMA_MODELS"] = (
-    "/home/andreas/Documents/Python/local_llm/models/llm/ollama"
-)
-
-
 def main():
     console = Console()
     console.clear()
@@ -31,19 +26,16 @@ def main():
 
     llm = LLM_Service()
 
-    if requests.get("http://127.0.0.1:11434/api/") == 200:
-        print("ollama already running")
-    else:
-        llm.start_ollama_server()
-
-    llm.fetch_llm()
     llm.make_chain()
 
     with alive_bar(100) as bar:
         for _ in range(100):
             time.sleep(0.005)
             bar()
-    print(f"LLM {llm.llm.model} running\n")
+    try:
+        print(f"LLM {llm.llm.model} running\n")
+    except:
+        print("llm model name not supported")
 
     ret = Retriever(config.retriever_config)
     with alive_bar(100) as bar:
@@ -63,13 +55,13 @@ def main():
     while True:
         user_query = console.input("[bold green]User: [/bold green]")
 
-        retrieved_context = ret.retrieve(user_query)
-
+        retrieved_context = ret.retrieve_faiss(user_query)
+        print(f"\nused context:\n{retrieved_context}\n")
         start_time = time.time()
-        llm.get_quick_response(user_query, retrieved_context)
+        llm.get_response(user_query, retrieved_context)
         end_time = time.time()
         time_elapsed = end_time - start_time
-        print(time_elapsed)
+        print(f"\ntime: {time_elapsed}")
 
 
 if __name__ == "__main__":

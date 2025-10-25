@@ -38,3 +38,16 @@ def download_models(model_path, required_models):
                         continue
             else:
                 print("All required models available")
+
+
+from sentence_transformers import SentenceTransformer
+
+model_path = (
+    "/home/andreas/Documents/Python/local_llm/models/embeddings/gte-multilingual-base"
+)
+
+model = SentenceTransformer(
+    "Alibaba-NLP/gte-multilingual-base",
+    trust_remote_code=True,
+    cache_folder=model_path,  # downloads + caches here
+)

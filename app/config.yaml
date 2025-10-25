@@ -3,11 +3,11 @@ llm_config:
   language_model: "gemma3:1b"
 
 retriever_config:
-  knowledge_path: /home/andreas/Documents/Python/local_llm/documents
+  knowledge_path: /home/andreas/Documents/Python/local_llm/documents/processed/
   embed_model: "ibm-granite/granite-embedding-107m-multilingual"
-  embedding_model_path: /home/andreas/Documents/Python/local_llm/models/ibm-granite/granite-embedding-107m-multilingual
-  chunk_size: 200
-  chunk_overlap: 50
+  embedding_model_path: /home/andreas/Documents/Python/local_llm/models/embeddings/gte-multilingual-base/
+  chunk_size: 400
+  chunk_overlap: 100
   vector_db_path: /home/andreas/Documents/Python/local_llm/app/chroma_db
 
 
