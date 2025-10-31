@@ -1,12 +1,13 @@
 from llm_service import LLM_Service
-from rag_service import Retriever
+from rag_service import HybridRetriever
 import sys
 from omegaconf import OmegaConf
-import os
 import time
 from rich.console import Console
 from alive_progress import alive_bar
 import requests
+
+config = OmegaConf.load("config.yaml")
 
 
 def main():
@@ -24,28 +25,20 @@ def main():
             time.sleep(0.005)
             bar()
 
-    llm = LLM_Service()
-
-    llm.make_chain()
+    llm = LLM_Service(config.llm_config)
 
     with alive_bar(100) as bar:
         for _ in range(100):
             time.sleep(0.005)
             bar()
-    try:
-        print(f"LLM {llm.llm.model} running\n")
-    except:
-        print("llm model name not supported")
 
-    ret = Retriever(config.retriever_config)
+    ret = HybridRetriever(config.retriever_config)
     with alive_bar(100) as bar:
         for _ in range(100):
             time.sleep(0.005)
             bar()
 
-    print(f"Retriever {ret.embedding_model_name} set up\n")
-
-    time.sleep(0.75)
+    time.sleep(0.25)
 
     console.clear()
 
@@ -55,13 +48,14 @@ def main():
     while True:
         user_query = console.input("[bold green]User: [/bold green]")
 
-        retrieved_context = ret.retrieve_faiss(user_query)
-        print(f"\nused context:\n{retrieved_context}\n")
-        start_time = time.time()
-        llm.get_response(user_query, retrieved_context)
-        end_time = time.time()
-        time_elapsed = end_time - start_time
-        print(f"\ntime: {time_elapsed}")
+        retrieved_context = ret.retrieve(user_query)
+        # start_time = time.time()
+        console.print("[bold blue]\nAI Response[/bold blue]")
+        llm.get_response(user_query, retrieved_context, console)
+        print("\n")
+        # end_time = time.time()
+        # time_elapsed = end_time - start_time
+        # print(f"\ntime: {time_elapsed}")
 
 
 if __name__ == "__main__":

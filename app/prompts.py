@@ -1,26 +1,12 @@
 def make_prompt():
-    prompt_template = """
-        You are a helpful assistant.
-        Use the provided context if relevant; if not, answer normally.
+    prompt_template = """You are a helpful AI assistant.
+    Answer the Users Question, strictly **using the provided context and cite it accordingly**, if applicable.
+    **If however there is no context given, simply answer the user question normally and do not cite anything.**
+    
+    **User Question:** {user_query}
 
-        [QUESTION]
-        {user_query}
-        
-        [CONTEXT]
-        {context}
-        """
-    return prompt_template
-
-
-def make_prompt2(user_query, context):
-    prompt = f"""
-You are a helpful assistant.
-Use the provided context if relevant; if not, answer normally.
-
-[QUESTION]
-{user_query}
-
-[CONTEXT]
-{context}
+    **Context:** {context}
+    
+    Now you:
 """
-    return prompt
+    return prompt_template
